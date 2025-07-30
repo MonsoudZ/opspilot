@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  store: one
+  rule_type: MyString
+  name: MyString
+  description: MyText
+  conditions: 
+  enabled: false
+  action_rate: 9.99
+  last_triggered_at: 2025-07-29 22:53:59
+
+two:
+  store: two
+  rule_type: MyString
+  name: MyString
+  description: MyText
+  conditions: 
+  enabled: false
+  action_rate: 9.99
+  last_triggered_at: 2025-07-29 22:53:59

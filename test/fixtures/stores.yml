@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  shopify_domain: MyString
+  stripe_account_id: MyString
+  slack_webhook_url: MyString
+  active: false
+
+two:
+  name: MyString
+  shopify_domain: MyString
+  stripe_account_id: MyString
+  slack_webhook_url: MyString
+  active: false
