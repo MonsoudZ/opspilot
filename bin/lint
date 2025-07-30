@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+# Comprehensive linting script for Rails app
+# Usage: bin/lint [--fix] [--js] [--css] [--ruby]
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Default values
+FIX=false
+LINT_JS=true
+LINT_CSS=true
+LINT_RUBY=true
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --fix)
+      FIX=true
+      shift
+      ;;
+    --js)
+      LINT_CSS=false
+      LINT_RUBY=false
+      shift
+      ;;
+    --css)
+      LINT_JS=false
+      LINT_RUBY=false
+      shift
+      ;;
+    --ruby)
+      LINT_JS=false
+      LINT_CSS=false
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: bin/lint [--fix] [--js] [--css] [--ruby]"
+      exit 1
+      ;;
+  esac
+done
+
+echo -e "${BLUE}🔍 Running linting checks...${NC}"
+
+# Function to run a linting command and handle errors
+run_lint() {
+  local name="$1"
+  local command="$2"
+  local fix_command="$3"
+  
+  echo -e "${BLUE}📋 Checking $name...${NC}"
+  
+  if [ "$FIX" = true ] && [ -n "$fix_command" ]; then
+    echo -e "${YELLOW}🔧 Running auto-fix for $name...${NC}"
+    if eval "$fix_command"; then
+      echo -e "${GREEN}✅ $name fixed successfully${NC}"
+    else
+      echo -e "${RED}❌ $name fix failed${NC}"
+      return 1
+    fi
+  else
+    if eval "$command"; then
+      echo -e "${GREEN}✅ $name passed${NC}"
+    else
+      echo -e "${RED}❌ $name failed${NC}"
+      return 1
+    fi
+  fi
+}
+
+# Track overall success
+SUCCESS=true
+
+# Ruby linting
+if [ "$LINT_RUBY" = true ]; then
+  if [ "$FIX" = true ]; then
+    run_lint "Ruby (RuboCop)" "bundle exec rubocop" "bundle exec rubocop -a" || SUCCESS=false
+  else
+    run_lint "Ruby (RuboCop)" "bundle exec rubocop" || SUCCESS=false
+  fi
+fi
+
+# JavaScript linting
+if [ "$LINT_JS" = true ]; then
+  if [ "$FIX" = true ]; then
+    run_lint "JavaScript (ESLint)" "npm run lint:js" "npm run lint:js:fix" || SUCCESS=false
+  else
+    run_lint "JavaScript (ESLint)" "npm run lint:js" || SUCCESS=false
+  fi
+fi
+
+# CSS linting
+if [ "$LINT_CSS" = true ]; then
+  if [ "$FIX" = true ]; then
+    run_lint "CSS (Stylelint)" "npm run lint:css" "npm run lint:css:fix" || SUCCESS=false
+  else
+    run_lint "CSS (Stylelint)" "npm run lint:css" || SUCCESS=false
+  fi
+fi
+
+# Security check (Brakeman)
+if [ "$LINT_RUBY" = true ]; then
+  echo -e "${BLUE}🔒 Running security check (Brakeman)...${NC}"
+  if bundle exec brakeman --no-progress --quiet; then
+    echo -e "${GREEN}✅ Security check passed${NC}"
+  else
+    echo -e "${RED}❌ Security check failed${NC}"
+    SUCCESS=false
+  fi
+fi
+
+echo -e "${BLUE}📊 Linting summary:${NC}"
+
+if [ "$SUCCESS" = true ]; then
+  echo -e "${GREEN}🎉 All linting checks passed!${NC}"
+  exit 0
+else
+  echo -e "${RED}💥 Some linting checks failed.${NC}"
+  echo -e "${YELLOW}💡 Run 'bin/lint --fix' to automatically fix issues where possible.${NC}"
+  exit 1
+fi 

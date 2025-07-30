@@ -1,0 +1,22 @@
+module.exports = {
+  rules: {
+    'at-rule-no-unknown': [
+      true,
+      {
+        ignoreAtRules: [
+          'tailwind',
+          'apply',
+          'variants',
+          'responsive',
+          'screen',
+          'layer',
+        ],
+      },
+    ],
+    'declaration-block-trailing-semicolon': null,
+    'no-descending-specificity': null,
+    'import-notation': null,
+    'color-function-notation': null,
+    'alpha-value-notation': null,
+  },
+}; 
