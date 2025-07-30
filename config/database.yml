@@ -79,7 +79,14 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: opspilot_production
-  username: opspilot
-  password: <%= ENV["OPSPILOT_DATABASE_PASSWORD"] %>
+  primary:
+    <<: *default
+    database: opspilot_production
+    username: opspilot
+    password: <%= ENV["OPSPILOT_DATABASE_PASSWORD"] %>
+
+  queue:
+    <<: *default
+    database: opspilot_production
+    username: opspilot
+    password: <%= ENV["OPSPILOT_DATABASE_PASSWORD"] %>
